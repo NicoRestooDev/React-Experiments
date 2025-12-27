@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import  confetti from 'canvas-confetti'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -41,12 +42,14 @@ function App() {
 
   const [winner, setWinner] = useState(null) // null es que no hay ganador, false es que hay un empate
 
+  const [showWinner, setShowWinner] = useState(false)
+
   const checkWinner = (boardToCheck) => {
     for (const combo of winnerCombos){
       const [a, b, c] = combo
       if (boardToCheck[a]
-          && (boardToCheck[a] === boardToCheck[b] 
-          && boardToCheck[c]) )
+          && (boardToCheck[a] === boardToCheck[b]) 
+          && (boardToCheck[a] === boardToCheck[c]))
       {
         return boardToCheck[a]
       }
@@ -55,16 +58,18 @@ function App() {
     return null;
   }
 
-  const isGameOver = (newBoard) => {
+  const isGameOver = (boardToCheck) => {
+    return boardToCheck.every(square => square != null)
   }
   const resetGame = () => {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
-    setWinner(null) 
+    setWinner(null)
+    setShowWinner(false)
   }
 
   const closeModal = () => {
-    
+    setShowWinner(false)
   }
 
   const updateBoard = (index) => {
@@ -79,8 +84,11 @@ function App() {
     const newWinner = checkWinner(newBoard)
     if (newWinner){
       setWinner(newWinner)
+      setShowWinner(true)
+      confetti()
     } else if (isGameOver(newBoard)){
       setWinner(false) // Empate
+      setShowWinner(true)
     }
   }
   return (
@@ -108,7 +116,7 @@ function App() {
         </Square>
       </section>
 
-      { winner != null && (
+      { showWinner && (
         <section className = 'winner'>
           <div className='text'>
             <h2>{
